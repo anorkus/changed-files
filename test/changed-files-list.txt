@@ -2,3 +2,4 @@
 action.yml
 action.yml
 test/changed-files-list.txt
+test/test\ new.txt

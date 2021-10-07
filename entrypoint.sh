@@ -116,23 +116,23 @@ else
     ALL_MODIFIED_FILES_ARRAY+=($(git diff --diff-filter="ACMR" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
   done
 
-  ADDED=$(echo "${ADDED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  COPIED=$(echo "${COPIED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  DELETED=$(echo "${DELETED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  MODIFIED=$(echo "${MODIFIED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  RENAMED=$(echo "${RENAMED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  TYPE_CHANGED=$(echo "${TYPE_CHANGED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  UNMERGED=$(echo "${UNMERGED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  UNKNOWN=$(echo "${UNKNOWN_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  ALL_CHANGED_AND_MODIFIED=$(echo "${ALL_CHANGED_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-  ALL_MODIFIED_FILES=$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  ADDED=$(echo "${ADDED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  COPIED=$(echo "${COPIED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  DELETED=$(echo "${DELETED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  MODIFIED=$(echo "${MODIFIED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  RENAMED=$(echo "${RENAMED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  TYPE_CHANGED=$(echo "${TYPE_CHANGED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  UNMERGED=$(echo "${UNMERGED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  UNKNOWN=$(echo "${UNKNOWN_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  ALL_CHANGED_AND_MODIFIED=$(echo "${ALL_CHANGED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  ALL_MODIFIED_FILES=$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
 
   ALL_OTHER_MODIFIED_FILES=$(git diff --diff-filter="ACMR" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA")
 
-  IFS=" " read -r -a UNIQUE_ALL_MODIFIED_FILES_ARRAY <<< "$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | tr " " "\n" | sort -u | tr "\n" " ")"
-  IFS=" " read -r -a OTHER_MODIFIED_FILES_ARRAY <<< "$(echo "${ALL_OTHER_MODIFIED_FILES[@]}" "${UNIQUE_ALL_MODIFIED_FILES_ARRAY[@]}" | tr " " "\n" | sort | uniq -u | tr "\n" " ")"
+  IFS=" " read -r -a UNIQUE_ALL_MODIFIED_FILES_ARRAY <<< "$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | sort -u | tr "\n" " ")"
+  IFS=" " read -r -a OTHER_MODIFIED_FILES_ARRAY <<< "$(echo "${ALL_OTHER_MODIFIED_FILES[@]}" "${UNIQUE_ALL_MODIFIED_FILES_ARRAY[@]}" | sort | uniq -u | tr "\n" " ")"
 
-  OTHER_MODIFIED_FILES=$(echo "${OTHER_MODIFIED_FILES_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  OTHER_MODIFIED_FILES=$(echo "${OTHER_MODIFIED_FILES_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
 
   echo "Matching modified files: ${UNIQUE_ALL_MODIFIED_FILES_ARRAY[*]}"
 
@@ -152,10 +152,10 @@ else
 
   OTHER_DELETED_FILES=$(git diff --diff-filter=D --name-only "$PREVIOUS_SHA" "$CURRENT_SHA")
 
-  IFS=" " read -r -a UNIQUE_DELETED_FILES_ARRAY <<< "$(echo "${DELETED_ARRAY[*]}" | tr " " "\n" | sort -u | tr "\n" " ")"
-  IFS=" " read -r -a OTHER_DELETED_FILES_ARRAY <<< "$(echo "${OTHER_DELETED_FILES[@]}" "${UNIQUE_DELETED_FILES_ARRAY[@]}" | tr " " "\n" | sort | uniq -u | tr "\n" " ")"
+  IFS=" " read -r -a UNIQUE_DELETED_FILES_ARRAY <<< "$(echo "${DELETED_ARRAY[*]}" | sort -u | tr "\n" " ")"
+  IFS=" " read -r -a OTHER_DELETED_FILES_ARRAY <<< "$(echo "${OTHER_DELETED_FILES[@]}" "${UNIQUE_DELETED_FILES_ARRAY[@]}" | sort | uniq -u | tr "\n" " ")"
 
-  OTHER_DELETED_FILES=$(echo "${OTHER_DELETED_FILES_ARRAY[*]}" | tr " " "\n" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
+  OTHER_DELETED_FILES=$(echo "${OTHER_DELETED_FILES_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
 
   echo "Matching deleted files: ${UNIQUE_DELETED_FILES_ARRAY[*]}"
 

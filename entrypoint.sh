@@ -34,7 +34,7 @@ fi
 
 if [[ -z $GITHUB_BASE_REF ]]; then
   if [[ -z $INPUT_BASE_SHA ]]; then
-    PREVIOUS_SHA=$(git rev-parse HEAD^1 2>&1) && exit_status=$? || exit_status=$?
+    PREVIOUS_SHA=$(git rev-parse HEAD~3 2>&1) && exit_status=$? || exit_status=$?
   else
     PREVIOUS_SHA=$INPUT_BASE_SHA
   fi
@@ -95,25 +95,25 @@ else
     echo "Checking for file changes: \"${path}\"..."
     IFS=" "
     # shellcheck disable=SC2207
-    ADDED_ARRAY+=($(git diff --diff-filter=A --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    ADDED_ARRAY+=($(git diff --diff-filter=A --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    COPIED_ARRAY+=($(git diff --diff-filter=C --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    COPIED_ARRAY+=($(git diff --diff-filter=C --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    DELETED_ARRAY+=($(git diff --diff-filter=D --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    DELETED_ARRAY+=($(git diff --diff-filter=D --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    MODIFIED_ARRAY+=($(git diff --diff-filter=M --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    MODIFIED_ARRAY+=($(git diff --diff-filter=M --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    RENAMED_ARRAY+=($(git diff --diff-filter=R --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    RENAMED_ARRAY+=($(git diff --diff-filter=R --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    TYPE_CHANGED_ARRAY+=($(git diff --diff-filter=T --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    TYPE_CHANGED_ARRAY+=($(git diff --diff-filter=T --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    UNMERGED_ARRAY+=($(git diff --diff-filter=U --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    UNMERGED_ARRAY+=($(git diff --diff-filter=U --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    UNKNOWN_ARRAY+=($(git diff --diff-filter=X --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    UNKNOWN_ARRAY+=($(git diff --diff-filter=X --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
     # shellcheck disable=SC2207
-    ALL_CHANGED_ARRAY+=($(git diff --diff-filter="*ACDMRTUX" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    ALL_CHANGED_ARRAY+=($(git diff --diff-filter="*ACDMRTUX" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" |  xargs -0 || true))
     # shellcheck disable=SC2207
-    ALL_MODIFIED_FILES_ARRAY+=($(git diff --diff-filter="ACMR" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -d '\n' printf "'%s'" || true))
+    ALL_MODIFIED_FILES_ARRAY+=($(git diff --diff-filter="ACMR" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA" | grep -E "(${path})" | xargs -0 || true))
   done
 
   ADDED=$(echo "${ADDED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
@@ -126,7 +126,6 @@ else
   UNKNOWN=$(echo "${UNKNOWN_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
   ALL_CHANGED_AND_MODIFIED=$(echo "${ALL_CHANGED_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
   ALL_MODIFIED_FILES=$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | sort -u | awk -v d="$INPUT_SEPARATOR" '{s=(NR==1?s:s d)$0}END{print s}')
-
   ALL_OTHER_MODIFIED_FILES=$(git diff --diff-filter="ACMR" --name-only "$PREVIOUS_SHA" "$CURRENT_SHA")
 
   IFS=" " read -r -a UNIQUE_ALL_MODIFIED_FILES_ARRAY <<< "$(echo "${ALL_MODIFIED_FILES_ARRAY[*]}" | sort -u | tr "\n" " ")"
@@ -172,6 +171,19 @@ else
   elif [[ -n "${UNIQUE_DELETED_FILES_ARRAY[*]}" ]]; then
     echo "::set-output name=only_deleted::true"
   fi
+fi
+
+if [[ -n $INPUT_QUOTE_OUTPUT ]]; then
+  ADDED=$(echo "${ADDED[*]}" | xargs -d '\n' printf "'%s' ")
+  COPIED=$(echo "${COPIED[*]}" | xargs -d '\n' printf "'%s' ")
+  DELETED=$(echo "${DELETED[*]}" | xargs -d '\n' printf "'%s' ")
+  MODIFED=$(echo "${MODIFIED[*]}" | xargs -d '\n' printf "'%s' ")
+  RENAMED=$(echo "${RENAMED[*]}" | xargs -d '\n' printf "'%s' ")
+  TYPE_CHANGED=$(echo "${TYPE_CHANGED[*]}" | xargs -d '\n' printf "'%s' ")
+  UNMERGED=$(echo "${UNMERGED[*]}" | xargs -d '\n' printf "'%s' ")
+  UNKNOWN=$(echo "${UNKNOWN[*]}" | xargs -d '\n' printf "'%s' ")
+  ALL_CHANGED_AND_MODIFIED=$(echo "${ALL_CHANGED_AND_MODIFIED[*]}" | xargs -d '\n' printf "'%s' ")
+  ALL_MODIFIED_FILES=$(echo "${ALL_MODIFIED_FILES[*]}" | xargs -d '\n' printf "'%s' ")
 fi
 
 echo "Added files: $ADDED"

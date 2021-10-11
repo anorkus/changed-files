@@ -34,7 +34,7 @@ fi
 
 if [[ -z $GITHUB_BASE_REF ]]; then
   if [[ -z $INPUT_BASE_SHA ]]; then
-    PREVIOUS_SHA=$(git rev-parse HEAD~3 2>&1) && exit_status=$? || exit_status=$?
+    PREVIOUS_SHA=$(git rev-parse HEAD^1 2>&1) && exit_status=$? || exit_status=$?
   else
     PREVIOUS_SHA=$INPUT_BASE_SHA
   fi

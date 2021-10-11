@@ -28,6 +28,9 @@ inputs:
   path:
     description: 'Specify a relative path under $GITHUB_WORKSPACE to locate the repository'
     required: false
+  qoute_output:
+    description: 'Use single quotes for filenames in output'
+    required: false
 
 outputs:
   added_files:

@@ -108,6 +108,7 @@ jobs:
 | sha           |  `string`      |    `true`     | `${{ github.sha }}`           | Specify a different <br> commit SHA <br> used for <br> comparing changes  |
 | files\_from\_source\_file |  `string`      |    `false`     |                    | Source file <br> used to populate <br> the files input |
 | path | `string` | `false` |  | Relative path under <br> `GITHUB_WORKSPACE` <br> to the repository |
+| quote\_output | `string` | `false` |  | Specify if filenames should be quoted in actions output |
 
 ## Example
 
